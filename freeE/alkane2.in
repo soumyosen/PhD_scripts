@@ -1,0 +1,71 @@
+colvarsTrajFrequency 5000
+
+
+colvar {
+   name alkane
+
+   width 1.0
+
+   lowerboundary  0.0
+   upperboundary  50.0
+
+   lowerwallconstant 10.0
+   upperwallconstant 10.0
+
+   distance {
+      group1 {
+             atomnumbers { 7459 7462 7465 7468 7471 7474 7477 7480 7483 7487 7490 }
+              }
+       group2 {
+             atomnumbers { 640 641 642 643 644 645 646 647 648 649 650 651 652 653 654 655 656 657 658 659 660 661 662 663 664 665 666 667 668 669 670 671 672 673 1767 1768 1769 1770 1771 1772 1773 1774 1775 1776 1777 1778 1779 1780 1781 1782 1783 1784 1785 1786 1787 1788 1789 1790 1791 1792 1793 1794 1795 1796 1797 1798 1799 3239 3240 3241 3242 3243 3244 3245 3246 3247 3248 3249 3250 3251 3252 3253 3254 3255 3256 3257 }
+         }
+
+     }
+}
+
+
+colvar {
+     name Restraint
+
+     width 1.0
+
+     lowerboundary   0.0
+     upperboundary   5.0
+
+     lowerwallconstant 20.0
+     upperwallconstant 20.0
+
+     distanceXY {
+          main {
+             atomnumbers { 7459 7462 7465 7468 7471 7474 7477 7480 7483 7487 7490 }
+}
+           ref {
+             atomnumbers {640 641 642 643 644 645 646 647 648 649 650 651 652 653 654 655 656 657 658 659 660 661 662 663 664 665 666 667 668 669 670 671 672 673 1767 1768 1769 1770 1771 1772 1773 1774 1775 1776 1777 1778 1779 1780 1781 1782 1783 1784 1785 1786 1787 1788 1789 1790 1791 1792 1793 1794 1795 1796 1797 1798 1799 3239 3240 3241 3242 3243 3244 3245 3246 3247 3248 3249 3250 3251 3252 3253 3254 3255 3256 3257 }
+}
+           axis {
+           (0.0, 1.0, 0.0)
+           }
+        }
+}
+
+
+
+################################################
+# Put harmonic restraints on the colvars
+################################################
+
+harmonic {
+   colvars         alkane
+   forceConstant   3.0
+   centers         2.0
+   targetCenters  35.0
+   targetNumSteps 250000
+}
+
+# no harmonic potential on restraint, only step-potential
+harmonic {
+    colvars Restraint
+    centers 0.0
+    forceConstant 0.0
+}
+
