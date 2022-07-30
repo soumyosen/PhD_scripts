@@ -1,0 +1,12 @@
+gfortran -o 1 core2.f
+./1
+outpsf="core.psf"
+my formpsf
+rm m1.mod 1
+rm core.coor
+
+
+##vmd core.pdb
+#segname="NANO"
+#chain="G"
+#awk -v seg=$segname -v chain=$chain '{printf "ATOM  99999  %-4s%-4s%-4s%-4s%8.3f%8.3f%8.3f  0.00  0.00      %4s\n",$3,$4,chain,1,$5,$6,$7,seg}' core.coor > core2.pdb
