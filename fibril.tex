@@ -1,0 +1,906 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% This is a (brief) model paper using the achemso class
+%% The document class accepts keyval options, which should include
+%% the target journal and optionally the manuscript type.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\documentclass[journal=jacsat,manuscript=communication]{achemso}
+\usepackage{achemso}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Place any additional packages needed here.  Only include packages
+%% which are essential, to avoid problems later. Do NOT use any
+%% packages which require e-TeX (for example etoolbox): the e-TeX
+%% extensions are not currently available on the ACS conversion
+%% servers.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\usepackage[version=3]{mhchem} % Formula subscripts using \ce{}
+%\usepackage[T1]{fontenc}       % Use modern font encodings
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% If issues arise when submitting your manuscript, you may want to
+%% un-comment the next line.  This provides information on the
+%% version of every file you have used.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%\listfiles
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Place any additional macros here.  Please use \newcommand* where
+%% possible, and avoid layout-changing macros (which are not used
+%% when typesetting).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand*\mycommand[1]{\texttt{\emph{#1}}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Meta-data block
+%% ---------------
+%% Each author should be given as a separate \author command.
+%%
+%% Corresponding authors should have an e-mail given after the author
+%% name as an \email command. Phone and fax numbers can be given
+%% using \phone and \fax, respectively; this information is optional.
+%%
+%% The affiliation of authors is given after the authors; each
+%% \affiliation command applies to all preceding authors not already
+%% assigned an affiliation.
+%%
+%% The affiliation takes an option argument for the short name.  This
+%% will typically be something like "University of Somewhere".
+%%
+%% The \altaffiliation macro should be used for new address, etc.
+%% On the other hand, \alsoaffiliation is used on a per author basis
+%% when authors are associated with multiple institutions.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\author{Soumyo Sen}
+\affiliation[University of Illinois]
+{Department of Chemistry,University of Illinois, Chicago, Illinois 60607}
+\author{Lela Vukovi\'c}
+\affiliation[University of Texas]
+{Department of Chemistry,University of Texas, El Paso, Texas 79968} 
+\author{Petr Kr\'al}
+\email{pkral@uic.edu}
+\phone{+123 (0)123 4445556}
+\fax{+123 (0)123 4445557}
+\affiliation[University of Illinois]
+{Department of Chemistry, Physics, Biopharmaceutical Sciences, University of Illinois, Chicago, Illinois 60607}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% The document title should be given as usual. Some journals require
+%% a running title from the author: this should be supplied as an
+%% optional argument to \title.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\title[An \textsf{achemso} demo]
+  {Interactions of pre-engineered nanoparticles with $A\beta40$
+  fibril: energetics and structural modifications}
+%   \footnote{A footnote for the title}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Some journals require a list of abbreviations or keywords to be
+%% supplied. These should be set up here, and will be printed after
+%% the title and author information, if needed.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\abbreviations{IR,NMR,UV}
+\keywords{American Chemical Society, \LaTeX}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% The manuscript does not need to include \maketitle, which is
+%% executed automatically.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% The "tocentry" environment can be used to create an entry for the
+%% graphical table of contents. It is given here as some journals
+%% require that it is printed as part of the abstract page. It will
+%% be automatically moved as appropriate.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% The abstract environment will automatically gobble the contents
+%% if an abstract is not used by the target journal.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{abstract} Self-assembly of A$\beta$40 peptides leads to an amyloid fibril
+which causes Alzheimer's disease. Recently nanoparticles are used frquently in
+the medicinal field. Interactions of nanoparticles with A$\beta$40 fibril are
+important topic in the applications of nanotechnology in the medicinal field. We
+perform atomistic molecular dynamics simulations of five different types ligated
+nanoparticles with A$\beta$40 fibril. The simulations reveal that positively
+charged nanoparticles can make stable interactions with fibril surface.  The
+modes and the strength of the interactions can be controlled by changing the
+nature of the ligands. The binding of the nanoparticles on the fibril surface
+affect the structure of the fibril.  It changes the twist angle of the peptide
+and also changes the number of heavy atom contacts significantly in the fibril.
+All the nanoparticles affect the overall potential energy of $\beta$ sheet of
+the fibril depending on the nature of ligands.  We also investigate the binding
+of the nanoparticles at the tip of the fibril.  The result shows that only
+negatively charged particles can make stable interactions at this
+position.\end{abstract}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Start the main part of the manuscript here.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\section{Introduction} 
+
+\textbf{Introduction}
+
+Amyloid fibrils, generated by the aggregation of misfolded protein, cause many
+neurodegenerative diseases such as Alzheimer's disease, Parkinson's disease,
+type 2 diabetes, Huntington's disease, transmissible spongiform encephalopathies
+etc\cite{Chiti2006}. Out of all these neurodegenerative diseases, Alzheimer's
+disease becomes the most common in recent era\cite{..}.  Fibrillization of
+A$\beta$40 peptide \cite{Hardy2002, Selkoe2004} is mainly responsible for
+Alzheimer's disease. There are many different stages of A$\beta$40 amyloid
+fibril which act as a toxic substance. Initially it was thought that mature
+fibril is the main source of toxicity \cite{Hardy2002}.  Recent research shows
+that small soluble oligomer is more toxic than matured fibril \cite{Haass2007}.
+There are many reports regarding the inhibition of fibril formation, as example
+amphiphilic surfactant \cite{Steven2005}, polyphenols\cite{Porat2006},
+quinone-tryptophan hybrid (NQTrp)\cite{Attali2010}, nanoparticle coated with
+histidine-based polymer\cite{Palmal2014} are capable to inhibit amyloid fibril
+growth. But still there is a serious lack of understanding how to destabilize a
+matured fibril or a small oligomer.
+
+In the past decades, nanotechnology has been developed tremendously.  Nanoscale
+materials have been used in the medicinal field such as drug delivery, in vivo
+imaging, invitro diagnostics to prevent various diseases
+\cite{Bianco2005,Lademann2007,Igor2005, Paul2004,Pearson2016}. Applications of
+nanoscale systems in medicinal field make investigators interested to explore
+the interactions of nano systems with biological molecules like lipid-bilayer
+\cite{Hao2014,Lu2014}, protein molecules \cite{Shemetov2012,Nel2009}.  Recently
+it is found that nanoparticles (NPs)  can be used as broad spectrum virucidal
+drugs \cite{Francesco}. So it is very attractive to investigate the interactions
+of different types of NPs with A$\beta$40 amyloid fibril from the perspective of
+possible therapeutic approach.
+
+Experiments have demonstrated that in some cases, NPs induce fibrillization of
+the peptides \cite{Linse2007,Anika2016} and in other cases, they prevent
+\cite{Celia2008,Yoo2011}. Linse et al.\cite{Linse2007} have shown that the
+induced fibrillization depends on size, shape and the hydrophobicity of the NP
+surface whereas Yoo et al. \cite{Yoo2011} have suggested that the inhibition of
+fibrillization is the result of strong van der Waals interactions between the
+NPs and the fibril.  Molecular dynamics study by Brancolini et al.
+\cite{Brancolini2015} has shown the influence of citrate ligated gold NPs on an
+amyloidgenic protein. Recently Yang et al. \cite{Yang2015} have modeled the
+disruption of amyloid fibrils by graphene.   
+
+In this work, we model five different NPs containing $2.2$ nm diameter core and
+$90$ ligands. Each NP was simulated in the presence of the fibril to study the
+NPs and fibril interactions.  To find the nature of the interactions, detail
+calculations of coupling (Coulombic coupling and van der Waals interaction)
+between the NPs and fibril are performed. Then we systematically explore the
+effects of NPs interactions on the fibril by calculating the relative root mean
+square deflection of the backbone of $\beta$ sheet with respect to the simulated
+fibril without any NP, measuring twist angles between two peptides of the
+fibril, compairing the number of salt bridge interactions and heavy atoms
+contact in the fibril in the presence or absence of NPs. At the end, we also
+calculate the overall potential energy of the fibril $\beta$ sheet with or
+without the presence of NP to compare the change of stability in the fibril
+$\beta$ sheet.  Finally we investigate the capability of the NPs to inhibit the
+growth of the amyloid fibril by simulating the NPs at the tip of the fibril.
+
+\section{Results and Discussion}
+
+\textbf{Results and Discussion}
+
+The NPs are modeled with five different ligands: positively charged
+($NH_{3}^{+}$ terminal group) (pos-lig), negatively charged (neg-lig)
+($SO_{3}^{-}$ terminal group, neutral (nut-lig) (NQTrp terminal group) and
+peptide ligand (pep-lig) (Fig.~\ref{ligs}).  Except pep-lig, the other ligands
+contain PEG (polyethylene glycol) chain to remove undesired protein
+interactions and to increase the solubilty of the NPs. The PEG chains are short
+(only two polyethylene glycol units) to achieve coherent interactions and to
+remove the interligand interactions \cite{Hao2014}.  In the case of pep-lig, we
+design the ligand (Glu-Leu-Val-Phe-Phe-Ala-Lys-Lys) following the aminoacid
+sequence (Lys-Leu-Val-Phe-Phe-Ala-Glu-Asp) of $\beta$ sheet region of the
+fibril where we replace the charged amino acids with oppositely charged amino
+acids keeping the remaining same. The peptide ligands are attached with the
+metallic core by thiol group of Cysteine amino acid. 
+ 
+\begin{figure}[h] \centering
+	\includegraphics[width=8cm,height=5cm,keepaspectratio]
+	{ligs} \caption{(Pos-lig) PEG chain ternimated with $NH_{3}^{+}$
+group, (Neg-lig) PEG chain terminated with $SO_{3}^{-}$ group, (Nut-lig) PEG
+chain terminated with NQTrp (quinone-tryptophan hybrid), (Pep-lig)
+Peptide ligand}\label{ligs} \end{figure}
+
+\begin{table}[]
+\centering
+\caption{Detail ligands ratio of each nanoparticle}
+\label{NPstable}
+\begin{tabular}{lllll}
+	Pos    & 	90 pos-lig	\\
+        PosNQ  & 	80 pos-lig, 10 nut-lig	\\
+        NegNQ  & 	80 neg-lig, 10 nut-lig	\\
+        PepNP  &        90 pep-lig	\\
+        Janus  &        45 pos-lig, 45 neg-lig	
+\end{tabular}
+\end{table}
+
+Total five different types of NPs (Table.~\ref{NPstable}) are prepared to
+explore the interactions between NPs and A$\beta$40 amyloid fibril.  All the NPs
+contain $2.2$ nm diameter gold core. $90$ ligands are uniformly distributed on
+gold surface. Since A$\beta$40 amyloid fibril is overall negatively charged, we
+model three different types of NPs with overall postive charge. In the case of
+PosNQ and NegNQ, the number of nut-lig is optimized in such a way that multiple
+NQTrp molecules cannot make cluster on the NP surface. The clustering of these
+NQTrp groups prevent them to interact with the amino acids of the
+fibril\cite{Pearson2016}.  Increasing the number of nut-ligs also decreases the
+solubility of the NPs in water. In the case of janus NP, there are $45$ positive
+ligands at one side of the NP and in the other side, there are $45$ negative
+ligands.
+
+%\begin{table}[]
+%\centering
+%\caption{Detail ligands ratio of each nanoparticle}
+%\label{NPstable}
+%\begin{tabular}{lllll}
+%	Pos    & 	90 pos-lig	\\
+%        PosNQ  & 	80 pos-lig, 10 nut-lig	\\
+%        NegNQ  & 	80 neg-lig, 10 nut-lig	\\
+%        PepNP  &        90 pep-lig	\\
+%        Janus  &        45 pos-lig, 45 neg-lig	
+%\end{tabular}
+%\end{table}
+
+\begin{figure}[h] \centering
+	        \includegraphics[width=6cm,height=10cm,keepaspectratio]
+		{posNQ} \caption{(Top) Initial structure of PosNQ NP with fibril, (Bottom)
+shows the NP interacting with L1 layer of the fibril after $90$ ns of
+simulation}\label{PosNQ} \end{figure}
+
+
+In our simulations, the positively charged NPs (Pos, PosNQ, PepNP) are strongly
+interacting at $\beta$ sheet surface  of layer 1 (L1) of the fibril. In the
+$\beta$ sheet region, Pos NP mainly becomes close to the negatively charged
+Glu22 and Val24. With time, Asp1, Ala2, Glu3 and Arg5 of the random chain region
+of L2 layer also starts to interact with the positive surface of the fibril.
+These interactions generate a strong Coulombic coupling (average Coulombic
+interaction energy $-290$ kcal/mol) between Pos and the fibril whereas the van
+der Waals (vdW) interaction strength is close to zero (average vdW interaction
+energy $13.0$ kcal/mol) Fig.~\ref{interaction}. 
+
+\begin{figure}[h] \centering
+	        \includegraphics[width=6cm,height=10cm,keepaspectratio]
+		{interaction} \caption{Electrostatic, van der Waals
+and total nobonding interaction energy}\label{interaction} \end{figure}
+
+In the case of PosNQ NP, there are two different types of terminal groups,
+positively charged ammonium groups and neutral NQTrp groups. The positively
+charged groups are mainly interacting with Phe20, Glu22 and Val24.
+Fig.~\ref{interaction} shows that Coulombic interactions between positively
+charged groups and amino acids provides a strong stabilization energy (average
+Coulombic interaction energy $-266.0$ kcal/mol).  Though the Coulombic
+interaction energy is comparatively smaller than Pos, there is a very strong
+vdW interaction energy (average strength $-90.0$ kcal/mol) due to the addition
+of NQTrp molecules at the terminal of $10$ ligands. Out of $10$ NQTrp groups,
+$4$ are close to the $\beta$ sheet region and are interacting with Hse14, Gln15,
+Lys16, Leu17, Val18, Phe20, Val24, Gly25, Ser26 and Asn27. Few random chains of
+the fibril are also wrapping the NP. The amino acids of the random chains close
+to the NP are Asp1, Glu3, Arg5, Asp7, Ser8, Glu9, Tyr10, Gln11, Hse13.
+
+The length of the ligand of PepNP is longer than the other ligand. It increases
+the overall radius of the NP bigger than all other NPs.  The Coulombic coupling
+(average strength $-185.0$ kcal/mol) and the vdW interaction strength (average
+vdW interaction energy $-135.0$ kcal/mol) between the NP and fibril are almost
+comparable to each other.  PepNP is strongly wrapped by the random chains of the
+fibril.  It can be seen that in the total interaction energy major contribution
+comes from the random chain region of the fibril (average Coulombic coupling
+between the NP and random chains $-122.0$ kcal/mol and average vdW interaction
+strength $-105.0$ kcal/mol) which is more than $75$\% of total interaction
+energy. The interacting amino acids are Asp1, Glu3, Phe4, Arg5, Hse6, Asp7,
+Ser8, Gly9, Tyr10, Glu11, Val18, Phe19, Phe20, Glu22, Asp23 and Val24.  
+
+In the case of Janus NP, a side of the NP is completely positive whereas the
+other side is completely negative. The positive side of the NP mainly interacts
+with the Phe20, Glu22, Asp23 and Val24 amino acids of $\beta$ sheet region
+whereas the negative side interacts with Hse13, Lys16, Val18 and Phe20. The
+random chains of the fibril does not wrap the NP. Our calculation shows that
+there is an attractive Coulombic coupling between the NP surface and $\beta$
+sheet region of the fibril. But the random chians increase the Coulombic
+repulsion. As a whole, the Coulombic interaction strength is almost zero and vdW
+interaction strength is $-46.0$ kcal/mol. 
+
+We have also modeled a negatively charged NP, named NegNQ which shows a strong
+vdW interaction (-$60.0$ kcal/mol) due to the presence of the NQTrp molecules.
+But there is stronger repulsive Coulombic interactions ($200.0$ kcal/mol)
+between the NP and the surface of the fibril which prevents the NP to be
+properly nested on the fibril surface. 
+
+\begin{figure}[h] \centering
+	        \includegraphics[width=8cm,height=8cm,keepaspectratio]
+		{new-rmsdB} \caption{Root mean square deviation of the peptide backbone 
+of L1 layer of the fibril of each NP-fibril system and only-fibril
+system with respect to the fibril without NP}\label{rmsdB1} \end{figure}
+
+We explore the effects of binding of four NPs (except NegNQ) on the fibril
+surface since NegNQ does not bind on the surface.  At the beginning, we compare
+the root-mean-square-deviation (RMSD) of the backbone atoms of the fibril with
+respect to the simulated fibril without NP. Fig.~\ref{rmsdB1} shows the RMSD of
+the L1 layer (layer close to the NP). In the same plot, the RMSD of the backbone
+atoms of $\beta$ sheet region of only-fibril system is also shown for last $5$
+ns (total $100$ ns simulation) with respect to the same reference frame used for
+other NP-fibril systems. The plot shows that the RMSDs of NP-fibril systems are
+always bigger than only fibril system. It proves that binding of NP induces some
+rearrangement in the $\beta$ sheet region.  RMSD is maximum for the case of
+PosNQ which can be explained by the strongest binding of PosNQ on $\beta$
+surface of the fibril. For Pos and PepNP, RMSDs of fibril $\beta$ sheet are also
+correlated with the binding strength. Though binding strength of Janus NP is
+significantly smaller than Pos, PosNQ and PepNP, the RMSD of $\beta$ sheet is
+similar with other NPs. The unique charge distribution on the surface of Janus
+NP might be the reason. It induces some rearrangement in the backbone close to
+the NP since the positive and negative both types of amino acids are interacting
+with Janus NP.
+
+The RMSD of the backbone of loop region (Ser26 to Ile31) is also performed
+separately. In all the cases we observed that RMSD of the loop (the average RMSD
+of loop for Pos, PosNQ, PepNP and Janus are $4.07$, $5.16$, $4.445$ and $4.63$
+{\AA}  respectively)is smaller than the RMSD of remaining $\beta$ sheet region
+(the average RMSD of the remaining $\beta$ sheet residues for Pos, PosNQ, PepNP
+and Janus are $4.65$, $6.04$, $5.28$ and $5.05$ {\AA} respectively). This result
+shows that the influence of the NPs is lower on the dynamics of the loop region
+than the remaining part of the $\beta$ sheet. 
+
+\begin{figure}[h] \centering
+	        \includegraphics[width=8cm,height=8cm,keepaspectratio]
+		{new-twist-com-a} \caption{(A) Average twist angles of the
+		peptides for each frame of Pos, PosNQ, PepNP and
+		Janus. (B) The distrbution of the twist angles of the 
+peptides for each type of NP}\label{twist-com} \end{figure}
+
+RMSD result shows that the backbone of fibril $\beta$ sheet is more deviated by
+the presence of NPs bound on the surface. So it is highly expected that NP
+binding might induce some structural change in the fibril.  To investigate the
+change in structural property of the fibril, we measure the average twist angle
+of the peptides in the presence and the absence of NP. In the case of NP-fibril
+systems, the average twist angle of the L1 layer of the fibril is more than
+$7.6$ degrees (Pos: $7.7$, PosNQ: $7.93$, PepNP: $8.08$ and Janus: $7.62$)
+whereas the average twist angle of the same layer for only-fibril system is
+$6.48$ degree (Fig.~\ref{twist-com}A).  Fig.~\ref{twist-com}B shows the
+histogram of the twist angles for each system. In the histogram, total number of
+counts for each system is $10500$ (total $500$ frames and each frame contains
+$21$ angles).  In all the cases, most of the twisting angles belong to $0$ to
+$10$ degree (Only fibril: $85.36$\%, Pos: $82.5$\%, PosNQ: $83.8$\%, PepNP:
+$74.5$\%, Janus: $75.5$\%). But the size of the distribution tail is longer in
+the presence of the NPs. The highest twist angle is less than $24$ degree for
+only fibril system which is also very similar for Janus NP.  But in the cases of
+Pos, PosNQ and PepNP, the highest twist angle is close to $30$ or more than $30$
+degree. The percentages of twist angle equal or more than $20$ degree for only
+fibril, Pos, PosNQ, PepNP and Janus are $1.4$\%, $9.3$\%, $8.7$\%, $8.6$\% and
+$1.13$\% respectively. In case of Janus, the percentage of twist angle in
+between $10$ to $20$ degree is the highest ($23.33$\%) among all the systems.  
+
+To investigate the reason behind the increment of average twist angles in the
+presence of NP binding, we spot out the positions of the large twist angles. We
+find that the peptides close to the NPs are arranging themselves in such a way
+that they can interact with the NPs and at the same time can make inter peptide
+interactions.  There are at least two positions in the fibril, where the set of
+peptides close to the NP meet other peptides. The large twist angles are present
+at the junction point and it increases the average twist angles of L1 layer.
+
+%\begin{figure}[h] \centering
+%	        \includegraphics[width=8cm,height=8cm,keepaspectratio]
+%		{new-twist-com-a} \caption{(A) Average twist angles of the
+%		peptides for each frame of Pos, PosNQ, PepNP and
+%		Janus. (B) The distrbution of the twist angles of the 
+%Peptides for each type of NP}\label{twist-com} \end{figure}
+
+We find that there is a direct impact of NP binding on the twist angles of the
+fibril. Another very important characteristic of fibril self-assembly is the
+formations of salt-bridge and hydrophobic interactions which provide a high
+stabilization in enthalpy and compensate the loss of entropy in the formation
+process.  To examine the effect of NP binding on the stability of fibril, we
+measure the number of salt bridge interactions and the number hydrophobic
+contacts in $\beta$ sheet region of the fibril. We calculate the number of salt
+bridge interactions with measuring the number of carboxylate oxygen atoms of
+Aspartic acid and Glutamic acid within $4$ of {\AA} of ammonium nitrogen of
+Lysine and guanidine nitrogen of Arginine. In the case of only fibril system,
+the average number of salt bridge interaction is $94.23$. In the presence of
+NPs, the average interactions vary in between $90-105$ (fig.~\ref{contact}A). We
+found that PosNQ has the lowest number of interactions ($90.99$) whereas Pos has
+the highest ($104.09$).  The number of salt bridge interactions for Janus and
+PepNP are $91.67$ and $96.26$ respectively. Combining all these information, it
+can be infered that binding of NP does not change significantly the number of
+salt bridge interactions.
+
+\begin{figure}[h] \centering
+	        \includegraphics[width=8cm,height=8cm,keepaspectratio]
+		{contact} \caption{(A) Number of salt bridge interactions in 4th to 25th 
+  peptide of the $\beta$ sheet in both layers. (B) Total number of heavy 
+  atom contacts in the $\beta$ sheet of the fibril (4th to 25th peptide).
+  (C) (Left) Number of heavy atom contacts in each layer L1 and L2 separately.
+  (Right) Number of heavy atom contacts between L1 and L2 layer.}\label{contact} 
+\end{figure}
+
+To calculate the total number of hydrophobic contacts in the $\beta$ sheet of
+the fibril, we measure the number of interpeptide contacts among all the heavy
+atoms with a cut-off distance $4$ {\AA} (Fig.~\ref{contact}B). We separately
+identify all the interpeptide heavy atoms contacts for both layers of the fibril
+(Fig.~\ref{contact}C(Left)). Then we measure the number of contacts between two
+layers (Fig.~\ref{contact}C(Right)). Fig.~\ref{contact}B shows that except
+PepNP, for all other NPs total number of heavy atoms contact decreases with
+respect to only fibril system.  This reduction is mainly observed in L1 layer
+(Fig.~\ref{contact}C. The strong interactions of the NPs with L1 layer of the
+fibril are mainly responsible to decrease the number of contact points in L1
+layer.  In the case of PosNQ, the contact in L1 layer is minimum. It shows that
+the mixture of positive and nutral ligands terminating with NQTrp reduces the
+maximum number of interpeptide contact points which definitely reduces the vdW
+potential energy among the fibril $\beta$ sheet. Pos NP decreases the intralayer
+contact points for both layers. But the number of interlayer contact points is
+almost same like only fibril system. The behavior of Janus is little different
+from Pos. The numbers of intralayer contact points for L1 and L2 are little
+bigger than Pos, but the number interlayer contact points is significantly lower
+than only-fibril system and Pos. Eventually, in the case of Janus NP, fibril
+contains the second lowest number of heavy atom contacts after PosNQ NP. The
+presence of unique charge distribution on the surface of Janus NP attracts both
+positive and negative amino acids of the fibril which may be the reason of
+significant reduction of interlayer heavy atom contacts by Janus NP.  In the
+case of PepNP, the total number of heavy atom contacts increases which indicates
+that the fibril becomes stabilize in the presence of more peptide concentration.
+This result is quite consistent with Sato et al's \cite{Sato2007}study where
+they engineer peptides according to sequence $A\beta14-23$. The peptides were
+used to capture soluble peptide oligomer and form amyloid like fibril.
+
+%\begin{figure}[h] \centering
+%	        \includegraphics[width=8cm,height=8cm,keepaspectratio]
+%		{contact} \caption{(A) Number of salt bridge interactions in 4th to 25th 
+%  peptide of the $\beta$ sheet in both layers. (B) Total number of heavy 
+%  atom contacts in the $\beta$ sheet of the fibril (4th to 25th peptide).
+%  (C) (Left) Number of heavy atom contacts in each layer L1 and L2 separately.
+%  (Right) Number of heavy atom contacts between L1 and L2 layer.}\label{contact} 
+%\end{figure}
+
+%of the NP and normalize the number with total number of atoms of the fibril
+%within this region. We perform the same calculation for the atoms outside $1$ nm
+%of the NP. The result shows that in a normal A$\beta$ amyloid fibril there are
+%$5.03$ H-bonding per $1000$ atoms.  But in the local region of the NP, this
+%number decreases to $1.7$ to $2.8$ in the case of Pos, PosNQ and Janus NP. In
+%the local region of Pos, PosNQ and Janus NP, the number is $1.7$, $2.8$ and
+%$2.2$ respectively whereas outside this region, the number of H-bonding per
+%$1000$ atoms are very close (Pos: $4.6$, PosNQ: $5.1$ and Janus: $4.8$) to the
+%normal fibril. We do not find any difference in H-bonding density (Local region
+%of PepNP: $5.1$ and Outside this region: $4.4$) in the local region of PepNP. 
+%
+%These results show that binding of Pos, PosNQ and Janus NP reduce the H-bonding
+%density almost to the half in their local regions. PepNP cannot affect the
+%H-bonding network in its neighborhood. Damage of this H-bonding network might be
+%related with the curvature of the NPs.  For Pos, PosNQ and Janus, the curvature
+%of the NP is bigger than the curvature of PepNP bacuse of having smaller ligands
+%compared to the long peptide ligands. To make strong interaction with smaller
+%NPs (Nps with higher curvature), the fibril needs to follow the surface
+%structure of the NPs which can reduce the overall number of H-bonding in the
+%fibril close to the NP.
+
+To shed light on the change of overall stability of the fibril due to the
+interactions with the NPs, we calculate Coulombic and vdW potential energy of
+the $\beta$ sheet of the fibril from 4th to 25th peptide for both layers.  In
+the calculation, we remove few peptides in both sides because the fluctuation of
+the peptides at the side is more than the inner peptids which might affect the
+result of overall stabilization.  Fig.~\ref{internal-beta} shows the change of
+potential energy of the $\beta$ sheet region in the presence of each NP compared
+to the fibril without any NP. 
+
+\begin{figure}[h] \centering
+	        \includegraphics[width=7cm,height=7cm,keepaspectratio]
+		{internal-beta} \caption{Change of Electrostatic, 
+van der Waals and total nobonding energy of the internal energy of 
+$\beta$ sheet region of the fibril}\label{internal-beta} \end{figure}
+
+The calculation shows that the $\beta$sheet region of A$\beta$40 amyloid fibril
+becomes stabilized mainly by vdW interaction strength (~$-3900$ kcal/mol).
+Compared to vdW, there is a weak repulsive Coulombic interaction (~$60$
+kcal/mol) which is due to the presence of same charged amino acids in a closely
+linear arrangement. Fig.~\ref{internal-beta} shows the effect of all four NPs on
+the internal energy of the fibril $\beta$ sheet.  There is a very small change
+($-4.7$ to $7.8$ kcalmol) in Coulombic coupling which is expected from the
+calculation of the number of salt bridge interaction.  In all the cases (In the
+presence and the absence of NP), the average number of salt bridge interaction
+is in between $90-105$. According to the potential energy of fibril $\beta$
+sheet, Coulombic coupling becomes destabilized for all the NPs except Janus NP.
+But this change is significantly smaller than vdW interaction strength. vdW
+interaction strength is destabilized by all the NPs.  The lowest vdW interaction
+change is observed for PepNP ($45$ kcal/mol) and the highest is for PosNQ
+($285.8$ kcal/mol). The trend makes a good correlation with the measured number
+of heavy atoms contact calculated using $4$ {\AA} cutoff except PepNP. In the
+case of PepNP, though number of contacts among heavy atoms is increasing in $4$
+{\AA} cut-off, still vdW interaction strength becomes destabilized. It means
+though the number of heavy atoms contact increases in the close range ($4$
+{\AA}), it decreases in the long range ($4-10$ {\AA}).  For Pos, the change in
+vdW interaction strength ($96.4$ kcal/mol) is not so big like PosNQ and Janus.
+Binding of Pos with fibril surface occurs mainly due to the Coulombic coupling.
+It changes the structure of the fibril close to the NP. But the peptides of the
+fibril rearrange themselves in such a way that Pos cannot destabilize the fibril
+$\beta$ sheet in a large extent. In the case of PosNQ and Janus, we can observe
+a large change of vdW interactions towards the positive direction. The $\beta$
+sheet region of the fibril becomes destabilized by $285.8$ kcal/mol for PosNQ
+and $214.2$ kcalmol for Janus. In the case of PosNQ, the NQTrp molecules bring
+extra interactions with many amino acids of the $\beta$ sheet (Hse14, Gln15,
+Lys16, Leu17, Val18, Phe19, Phe20, Glu22, Asp23, Val24, Gly25, Ser26, Asn27)
+which are very similar like Zhang et. al and Scherzer-Attali's study
+\cite{Attali2010, Zhang2014}.  These extra interactions may destabilize the
+$\beta$ sheet. For Janus, due to the presence of unique surface charge
+distribution (one side positive and the other side negative) the amino acids of
+$\beta$ sheet are trying to interact with both sides of the NPs.  In one side,
+Lys16 amino acid can interact with negative ligands whereas in other side Glu22,
+Asp23 can interact with positive ligands. These combined interactions
+destabilize the fibril $\beta$ sheet. 
+  
+\begin{figure}[h] \centering
+	        \includegraphics[width=7cm,height=7cm,keepaspectratio]
+		{interaction-tip} \caption{Electrostatic, van der Waals
+and total nobonding interaction energy of each nanoparticle
+interacting at the tip of the fibril}\label{interaction-tip} \end{figure}
+ 
+In addition to all, we investigate the interactions of all five NPs at the tip
+of the fibril to figure out if any of these NPs be potentially able to stop the
+growth of the fibril. We calculate the interaction energy between the NPs and
+the fibril in the same way like before.  Fig.~\ref{interaction-tip} shows that
+the positively charged NPs experience strong repusive electrostatic interactions
+at the tip of the fibril. The presence of Nut-ligs containing NQTrp groups and
+the pep-ligs are able to produce stabilized vdW interactions. But vdW
+interactions are not enough to compensate the repulsive electrostatic
+interactions. In the case of Janus NP, we simulated three different systems
+according to the orientation of the NP (Positively charged side towards fibril,
+negatively charged side towards fibril, positive and negative both oriented
+towrds the fibril) towards the fibril due to an assymetric ligand distribution.
+In the fig.~\ref{interaction-tip}, the average of all three simulations are
+shown for Janus NP. Only NegNQ shows strong attractive interaction energy,
+average electrostatic interaction energy $-108.6$ kcal/mol and average vdW
+interaction energy $-24.1$ kcal/mol.  It can be explained by the equipotential
+surfaces of $A\beta40$ fibril shown in figure SI.  The light blue color surface
+at the tip of the fibril corresponds to $2.6$ V whereas the light pink surfaces
+on $\beta$ sheet region correspond to $-10.4$ V.  It shows that negatively
+charged NPs are more preferable to block the growth of the fibril.
+
+%\begin{figure}[h] \centering
+%	        \includegraphics[width=7cm,height=7cm,keepaspectratio]
+%		{interaction-tip} \caption{Electrostatic, van der Waals
+%and total nobonding interaction energy of each nanoparticle
+%interacting at the tip of the fibril}\label{interaction-tip} \end{figure}
+
+
+\section{Conclusion} 
+
+\textbf{Conclusion} In summary we have studied five different NPs interacting
+with $A\beta40$ amyloid fibril. We found that positively charged NPs can
+interact with fibril surface whereas negatively charged NP can interact at the
+tip of the fibril.  In the case of positively charged NP, addition of NQTrp
+inhibitor at the terminal of few PEG ligands increases the vdW contact with
+fibril amino acids which decreses the interpeptide vdW contacts in the fibril
+and eventually destabilize the fibril $\beta$ sheet. Though Janus NP also can
+destabilize the fibril $\beta$ sheet, PosNQ shows maximum ability in
+destabilization. Our detail simulations provide some atomistic understanding how
+the NPs are destabilizing small fibril or peptide oligomers. This study is
+extremely helpful for experimentalists to engineer an effective system to break
+the peptide oligomer. Still there are many questions which need to be resolved.
+First of all what is the optimum concentration of NQTrp terminated ligand to get
+maximum destabilization in the fibril? There are still many fibril inhibitors
+like polyphenol, amphiphilic surfactant etc. It would be quite interesting to
+figure out which one affects maximum in this environment.  What will be the
+effect of multiple PosNQ NPs on the same fibril?  How NegNQ NP affect the
+stability of the fibril while interacting at the tip of the fibril?  In future,
+we would like to continue our research in this field and try to resolve these
+questions computationally. 
+
+
+
+\section{Method}
+
+\textbf{Methods}
+
+We model the NPs using our own TCL code. The initial structure of A$\beta$40
+fibril is based on pdb ID 2LMO \cite{Petkova2006}. In the coordinate file, first
+eight amino acids of each peptide were missing. We use Modeller program
+\cite{Sali1993,Fiser2000} to add the missing residues.  Then the fibril is
+prepared with $29$ A$\beta$40 monomers. After preparing the fibril, we simulated
+it in $150$ mM NaCl solution for $5$ ns. Then we placed the NP $5$ {\AA} above
+the fibril. All the simulated systems contain $400,000-600,000$ atoms. After the
+initial minimization and warming to $300$ K, ions and water molecules were
+equilibrated for $2$ ns. During ion and water equilibration, the movement of NP
+core and the protein backbone is restrained with a harmonic force constant of
+$1$ kcal/mol{\AA}$^{2}$. After releasing the NP and protein, all the systems
+were simulated for $90-100$ ns. Visual Molecular Dynamics (VMD)
+\cite{Humphrey1996} is used to visualize the NPs and the fibril. 
+
+We perform atomistic molecular dynamics (MD) simulations of each NP, fibril
+system in $150$ mM NaCl solution. The systems are simulated with NAMD package
+\cite{Philip2005} using CHARMM general\cite{Mackerell2010,Yu2012} and protein
+forcefield \cite{Mackerell1998,Mackerell2004}. In the simulations, we use
+Langevin dynamics with damping co-efficient of $\gamma_{lang} = 0.1$ $ps^{-1}$.
+Nonbonded van der Waals (vdW) interactions are calculated with the Lennard-Jones
+($12$,$6$) potential using the cut-off distance d = $10$ {\AA}.  Long range
+electrostatic interactions are calculated by the PME method \cite{PME} and the
+MD integration time step is set to $2$ fs. The simulations are performed using
+NPT ensemble (P = $1$bar and T = $300$K) in the presence of periodic boundary
+conditions. 
+
+After simulating each system for $90-100$ ns, we measured the interactions
+energy (electrostatic and vdW interaction energy) of the NPs with fibril 
+using VMD energy analysis plugin.  During the electrostatic
+calculations, we consider the dielectric constant of water equals to $78.5$. For
+vdW interaction, we use ($12$,$6$) Lennard-Jones potential with $10$ {\AA}
+cut-off. The overall potential energies of the $\beta$ sheet of the fibril in
+the presence and the absence of NP are also investigated using VMD plugin. Then
+we calculate the change of potential energy of the fibril $\beta$ sheet in the
+presence of NP following the equation ${\Delta}E = E_{NP} - E_{Fibril}$ 
+where $E_{NP}$ is the potential energy of fibril $\beta$ sheet in the presence
+of NP and $E_{Fibril}$ is the potential energy of the same region of the fibril
+of only fibril system. In this calculation, we use 4th to 25 th peptide out of
+29 peptides of both layers of the fibril. All the energies are calculated for
+last $200$ frames ($2$ ns). We also simulate five NPs at the tip of the fibril
+for $4-5$ ns and calculate the interaction energy of the NP with fibril tip.
+
+Root-mean-square-deviations (RMSD) of backbone atoms of the $\beta$ sheet region
+for each NP-fibril system and only fibril system are calculated compared to the
+system containing only the fibril. Before calculating the RMSD, the whole fibril
+of NP-fibril system is alligned with the fibril of only fibril system (the
+reference frame was taken after $30$ ns simulation of only fibril system). Then
+we calculate the RMSD of each peptide separately and finally take the average
+with the total number of peptides. The calculations are performed using equation
+$RMSD = 1/n \sum_{j=4}^{25} d_j$, where $n$, $j$ and $d_j$ are the number
+of peptides, the index of each peptide and  RMSD of j-th peptide respectively.
+The RMSD is calculated for $\beta$ sheet of both layers of the fibril. In each
+layer there are $29$ monomers. In the calculation, $4$th to $25$th monomers are
+taken into account because of higher fluctuation of the terminal peptides. The
+calculation is performed on last $500$ frames ($5$ ns)
+
+%\begin{equation}
+%	$RMSD = 1/n \sum_{j=4}^{25} d_j$
+%\end{equation}
+%Where n is the number of peptide. Here n is $22$. J is the index of
+%each peptide and $d_j$ is RMSD of j-th peptide.
+
+To calculate the average twist angle between two peptides, we first take a
+vector from alpha carbon atom of $32$nd amino acid residue to $18$th residue of
+each peptide. We measured the angle between the vector of one peptide and the
+same vector of the next peptide. Then we calculate the average of the twist
+angle. Like RMSD, we also calculate the twist angle from 4th to 25th monomer of
+each layer (L1 and L2 layer separately). The calculation is performed on last
+$5$ ns using equation $\theta_{twist} = 1/m \sum_{j=4}^{24} \phi_{j,j+1}$ 
+where $m$ is the number of peptide pairs, $j$ and $(j+1)$ are the indexes of two
+neighboring peptides and $\phi_{j,j+1}$ is the twist angle for a neighboring
+pair of peptide.
+
+Total number of salt bridge interactions is calculated by measuring the number
+of carboxylate atoms of Aspartic acid and Glutamic acid within $4$ {\AA} of
+ammonium nitrogen of Lysine and guanidine nitrogen of Arginine. We take the
+average of the number of salt bridge interactions on last $100$ frames ($1$ ns).
+We also calculate the total number of interpeptide heavy atoms contact of the
+$\beta$ sheet region. First we investigate the number of contacts of each layer
+individually, then we measure the number interlayer contacts. In both cases, we
+use $4$th to $25$th monomers out of $29$ monomers of each layer. We use last
+$50$ frames ($0.5$ ns) for this measurement. Number of intralayer heavy atoms
+contact is calculated using $N_{L} = \sum_{i=4}^{25}\sum_{j=i+1}^{j=i+5}
+N_{i,j}$ where $N_{L}$ is total number of contacts in L1 layer or L2 layer
+and $N_{i,j}$ is number of contacts in i-th and j-th peptide of the same layer.
+To measure the number of interlayer heavy atoms contact, we use $N_{L1,L2} =
+\sum_{i=4}^{25}\sum_{j=i-2}^{i+2}N_{i,j}$, where $N_{L1,L2}$ is number of
+contacts between L1 and L2 layer, $N_{i,j}$ is the number of contact between
+i-th peptide of L1 layer and j-th peptide of L2 layer. 
+
+
+
+   
+%The number of H-bonding in the peptides close to the NP is compared with the
+%peptides far from the NP. We measure the number of atoms and number of H-bonding
+%in the fibril within $1$ nm and outside $1$ nm of the NP. The conditions imposed
+%to determine a H-bonding are donor-acceptor distance (less than $3$ {\AA}) and
+%the angle between donor-H vector and H-acceptor vector (less than $20$ degree.
+%We show the number of H-bonding per $1000$ atoms. The H-bonding was analyzed for
+%last $5$ ns ($500$ frames) 
+%
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+%We use atomistic molecular dynamics (MD) simulations to model the
+%interactions of the NPs with A$\beta$40 fibril. The systems are
+%simulated with NAMD package \cite{Philips2005}.  We model multiple NPs
+%with four different types of the ligands (Figure1) at the surface.
+%Two different kinds of PEG ligands are prepared. In most of the PEG
+%ligands, positively charged ammonium groups are at the end and in few
+%cases, 1,4-napthoquinon-2-yltryptophan (NQTrp) group is used as the
+%terminal group. NQTrp is a potential inhibitor \cite{..} for the
+%self-assembly of A$\beta$40 fibril. We also design a peptide ligand
+%with sequence CELVFFAKK which is complementary to residue $16$ to $23$
+%(KLVFFAED) of A$\beta$40 peptide. The diameter of the gold core of the
+%NP is $2.2$nm. We prepare three different NPs, 1) $90$ positively
+%charged PEG ligands (pos), 2) $80$ positively charged PEG ligands and
+%$10$ PEG ligands terminated with NQTrp (pos-NQTRP) and 3) $90$ peptide
+%ligands (np-peptide). The ligands are evenly distributed on the
+%surface of the core.  The initial structure of A$\beta$40 fibril is
+%based on the pdb id 2LMO \cite{Petkova2006}. We add the missing
+%residues in the fibril using Modeller program
+%\cite{Sali1993,Fiser2000}. Then the fibril is propagated upto $15$ nm.
+%
+%Initially we simulate the particles and the fibril individually in an
+%ionic solution ($0.15$ M NaCl solution) for $10$ns. After that, each
+%type of the NPs is placed on the fibril and the combined system is
+%kept in an ionic solution with physiological concentration ($0.15$M).
+%Each combined system is simulated for 60 ns. The simulation of only
+%fibril is also ontinued upto 40 ns. In all the simulations, we use
+%CHARMM general \cite{Mackerell2010,Yu2012} and protein forcefield
+%\cite{Mackerell1998,Mackerell2004} for the simulations. The
+%simulations are performed in an NPT ensemble at T=$300$ K and P=$1$
+%bar. Nonbonding interactions are calculated using a cut-off distance
+%of $d=10$ angstrom and long range electrostatic interactions are
+%calculated by the PME method \cite{Darden1993} in the presence of the
+%periodic boundary conditions. The systems are simulated using the
+%Langevin dynamics with a damping constant of $0.1 ps^{-1}$ and the
+%timestep of $2$ fs. During the simulations, we applied a harmonic
+%potential to prevent the translational and rotational motion of the
+%fibril. 
+%
+%We calculate Coulombic
+%coupling and van der Waals interaction strength of the NPs with fibril
+%over the whole trajectory ($100$ns). In the calculations of Coulombic
+%interaction strength, the dielectric constant is equal to $78.5$.
+%
+%Initially we model three different kinds of NPs, neutral, negative and
+%positive. In the MD simulations, at the beginning, the NPs are kept
+%within $1$nm distance from the $\beta$ sheet of the fibril. With time,
+%the NPs become close to the fibril. Fig.~\ref{particles}\,A shows that
+%the neutral NPs become stabilized either on the the freely moving
+%amino acid chains or on the $\beta$ sheet. The negatively charged NPs
+%are initially nested on the positively charged K$16$ residues of the
+%fibril. After nesting, they are moving towrads the edge and become
+%stabilize on the freely moving aminoacid chains
+%(Fig.~\ref{particles}\,B). In case of the positively charged NPs, the
+%particles become stabilized over negatively charged E$22$ residues of
+%the fibril (Fig.~\ref{particles}\,C). 
+%
+%Fig.~\ref{particles}\,D shows the van der Waals (vdW) and Coulombic
+%coupling strength between the NPs and the fibril. For the neutral
+%particles, NPs become stabilized by strong vdW interaction strength
+%irrespective of their positions. The vdW interaction strength is close
+%to $250$ kcal/mol. The Coulombic coupling strength is zero. In the
+%case of the negatively charged particles, the total interaction
+%strength varies $60$-$90$ kcal/mol where the major contribution comes
+%from vdW interactions (vdW interaction strength:$40$-$80$ kcal/mol,
+%Coulombic interaction strength:$10$-$30$ kcal/mol). The interactions
+%strength for the positively charged particles belongs to $30$-$90$
+%kcal/mol. But in this case, the Coulombic coupling strength
+%($30$-$100$ kcal/mol) is playing the main role. The vdW interaction
+%provides a small repulsive interaction ($5$-$10$ kcal/mol). 
+%
+%\begin{figure}
+%\centering
+%\includegraphics[width=3.5in]{parts1d-int5a.ps}
+%\caption{\normalsize A) Neutral NPs,
+%B) Negative NPs, C) Positive NPs. Fibril is shown using surface
+%representation. Red represents negative, blue represents positive,
+%green represents polar and white represents non polar aminoacids.
+%In A, orange and yellow enclosure show K$16$ and E$22$ residues 
+%respectively. The region between two black arrows is $\beta$ sheet
+%region and the region between black and red arrow in both sides
+%contains freely moving amino acid chains. D) Coulombic interactions, 
+%van der Waals interactions and total interaction strength in kcal/mol}
+%\label{particles}
+%\end{figure}
+%
+%The neutral NPs can be properly wrapped up by the freely moving amino
+%acid chains which increases the vdW interaction strength. The same is
+%true for negatively charged NPs.  The K$16$ (Fig.~\ref{particles}\,A,
+%the black circle) residues on which negatively charged NPs are nested,
+%are very close to the freely moving chains. But the positively charged
+%NPs are nested on E$22$ (Fig.~\ref{particles}\,A, the whitish
+%circle)residues which are far from the free chains. That is the reason
+%why the free chains can not properly wrap up the positively charged
+%NPs. In the case of the negative particles, the Coulombic coupling is
+%initially being stabilized, then it passes through a minimum point and
+%after that it slowly becomes destabilized (Figure in supporting info).
+%The destabilization appears due to the Coulombic repulsion of negative
+%ligands with negative E$22$ residues and the negative residues of free
+%aminoacid chains (D$1$, E$3$, D$7$, E$11$ residues).     
+%
+%\begin{figure}
+%\centering
+%\includegraphics[width=2.6in]{mixed2-int6a.ps}
+%\caption{\normalsize A) NPs with $30$\% negative and $70$\%
+%neutral ligands, B) NPs with $70$\% negative and $30$\% neutral
+%ligands, C) Interaction strength of all four NPs with fibril
+%in kcal/mol. Neg$30$\%-$1$ is particle $1$ of A, Neg$30$\%-$2$ is
+%particle $2$ of A, Neg$70$\%-$1$ is particle $1$ of B and
+%Neg$70$\%-$2$ is particle $2$ of B}
+%\label{mixed}
+%\end{figure}
+%
+%In the case of the negative particles, to increase the vdW
+%interactions strength we substitute some of the negative ligands with
+%neutral ligands. So we prepare two more different types of the
+%particles ($30$\% negative ligands, $70$\% neutral ligands and $70$\%
+%negative ligands, $30$\% neutral ligands). Fig.~\ref{mixed}\,A,B show
+%that there are two different positions where these NPs can be
+%stabilized. In both cases, initially the NPs are nested on the K$16$
+%residues. Then either they are moving towards the freely moving amino
+%acid chains or towards the $\beta$ sheet region
+%(Fig.~\ref{mixed}\,A,B). From the energetics (Fig.~\ref{mixed}\,C), it
+%can be observed that substituting some negative ligands with neutral
+%ligands is increasing the vdW coupling strength ($150-250$ kcal/mol).
+%But it adds a small repulsive Coulombic interactions ($25-50$
+%kcal/mol) due to the Coulombic coupling between negative ligands and
+%the negative amino acids (E$22$, D$1$, E$3$, D$7$, E$11$ residues) of
+%$\beta$ sheet and free amino acid chains. The Coulombic coupling
+%passes through a minimum point like fully negative particles.  With
+%increasing the percentage of the negative ligands, the NPs on the
+%$\beta$ sheet region become destabilized due to the presence of the
+%strong Coulombic repulsion between the negatively charged ligands and
+%the E$22$ residues 
+%
+%To understand the effect of the particle size on the interactions of
+%the NPs with the fibril, we prepare a NP with a core of $5.5$ nm
+%diamter and $400$ ligands ($70$\% negative ligands and $30$\% neutral
+%ligands). The particle is nested on the fibril in the simulations.But
+%the energetics (Fig.~\ref{large}\,A) show that it is not stable over
+%the fibril. Though the attractive vdW interaction strength is $50$
+%kcal/mol, the repulsive Coulombic coupling is $75$ kcal/mol (figure in
+%supporting info) which destabilizes the particle on the fibril.
+%
+%\begin{figure}
+%\centering
+%\includegraphics[width=2.6in]{large2.ps}
+%\caption{\normalsize A) Large nanoparticle with $70$\% negative and
+%$30$\% neutral ligands on A$\beta$40 fibril, B) Pinkish surface
+%shows the negative equipotential surface of potential $-8.2$V}
+%\label{large}
+%\end{figure}
+%
+%We perform an electrostatic surface calculation. Fig.~\ref{large}\,B
+%shows that there are two parallel negative equipotential ($-8.2$ V)
+%surfaces present in A$\beta$40 fibril. Only a small NP ($2-3$nm
+%diameter) can be fit in between these two surfaces. There is a huge
+%overlap between the negatively charged, large NP ($5-6$nm diameter)
+%and the negative surface which destabilizes the nesting of large NP on
+%A$\beta$40 fibril.
+%
+%In summary, we have provided a detailed study of the interactions of the
+%NPs with A$\beta$40 fibril. Our study reveals that small NPs ($3$ nm
+%diameter) can make stable interactions with the fibril regardless of
+%their electrostatic property of the surface. The nesting positions of
+%the NPs and the mode of interactions between NPs and the fibril are
+%different depending on the surface property. Among all three types of
+%the particles (neutral, negative and positive), the neutral NPs make
+%the strongest interactions.  The large NPs (more than $5$ nm diamter)
+%can not be stabilized over A$\beta$40 fibril.  Our study provides a
+%good understanding about the functions of the NPs over A$\beta$40
+%fibril with different surface charge. It helps experimentalists to
+%engineer the NPs which can effectively interact with A$\beta$40 fibril
+%and may prevent the growth of the fibril.
+
+\begin{acknowledgement}
+The authors thank Dr. Francesco Stellacci for his valuable discussion
+about his experimental results. This work was suppoted by NSF grants.
+Some of the calculations were performed in UIC Extreme (super
+computing cluster). 
+\end{acknowledgement}
+
+\begin{suppinfo}
+All the plots containing the change of Coulombic, van der Waals
+coupling and total interaction strength with the trajectory of the
+simulations
+\end{suppinfo}
+
+\bibliographystyle{achemso}
+\bibliography{fibril}
+
+
+\end{document}

@@ -1,0 +1,37 @@
+#!/bin/bash
+functionsPath="/home/rebecca/bin/myfunctions"
+if [ ! -f $functionsPath ];then echo "cannot find $functionsPath";exit;fi
+source $functionsPath
+
+if [ "$1" == "" ];then
+printf "
+=============
+my gjf2psfpdb
+=============
+ make pdb and psf from gjf
+
+=============
+my duplicate
+=============
+ duplicate pdb and/or psf
+
+-------------
+my cutpsf
+-------------
+ split psf into sections
+-------------
+my bond2gjf
+-------------
+ convert bond.0 (psf section) to link.0 (gjf bond format)
+-------------
+my gjf2bond
+-------------
+ convert link.0 (gif bond format) to psf sections
+-------------
+my formpsf
+-------------
+ convert psf sections to psf
+"
+else
+$1
+fi

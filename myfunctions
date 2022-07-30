@@ -1,0 +1,596 @@
+#!/bin/bash
+#functionsPath="myfunctions"
+#if [ ! -f $functionsPath ];then echo "cannot find $functionsPath";exit;fi
+#source $functionsPath
+
+#duplicate
+
+#cutpsf
+#psf
+
+#gjf2psfpdb
+#psf
+
+
+######################################################################
+function inputfile() {
+if [ ! -f "$par" ];then
+numfile=$(ls -l $search 2>/dev/null|wc -l)
+filelist=$(ls -l $search 2>/dev/null|awk '{print $NF}'|paste -s -d' ')
+r=0
+case "$numfile" in
+1) par=$filelist
+   ;;
+*) if [ $numfile -eq 0 ];then 
+   printf "  Cannot find $search\n"
+   else
+   echo;ls $search;echo
+   fi
+   while [[ $par == "" ]];do 
+   printf "$msg ";read par;
+   r=1
+   if [ ! -f "$par" ];then par="";fi
+   done
+esac
+fi
+[[ $r -ne 1 ]] && (printf "$msg $par\n")
+}
+function ask() {
+if [ ! $par == "" ];then echo "$msg $par";fi
+while [[ $par == "" ]];do printf "$msg ";read par;done
+}
+function endprogram() {
+for temp in $tempfiles;do rm $temp 2>/dev/null;done
+[ "$outputfiles" != "" ] && (printf "  DONE, output: ")
+for outputfiles in $outputfiles;do
+[ -f $outputfiles ] && (printf "$outputfiles ")
+done
+printf "\n\n"
+}
+
+######################################################################
+
+function countpsf() {
+printf "\n\nCOUNTPSF: count number of atoms, bond, ang, dih\n"
+printf "  reading atom.0 bond.0 ang.0 dih.0\n"
+aa=$(wc -l atom.0|awk '{print $1}')
+printf "\n% 8d !NATOM\n" $aa > aa.0
+b=$(wc -l bond.0|awk '{print $1}')
+printf "\n% 8d !NBOND: bonds\n" $b > b.0
+a=$(wc -l ang.0|awk '{print $1}')
+printf "\n% 8d !NTHETA: angles\n" $a > a.0
+d=$(wc -l dih.0|awk '{print $1}')
+printf "\n% 8d !NPHI: dihedrals\n" $d > d.0
+printf "  $aa ATOMS, $b BONDS, $a ANGLES, $d DIHEDRALS\n"
+tempfiles=""
+outputfiles="aa.0 b.0 a.0 d.0"
+endprogram
+}
+function formatpsf() {
+printf "\n\nFORMATPSF: format psf bonding sections\n"
+printf "  writing h.0 (psf header)\n"
+printf "PSF\n\n       0 !NTITLE\n" > h.0
+printf "  reformatting bond.0 ang.0 dih.0 to bond.1 ang.1 dih.1\n"
+if [ ! -f bond.0 ];then printf "" > bond.0;fi
+sed 's/[ \t]*$//g' bond.0|sed '$!N;s/\n//'|sed '$!N;s/\n//' >bond.1
+if [ ! -f ang.0 ];then printf "" > ang.0;fi
+sed 's/[ \t]*$//g' ang.0|sed '$!N;$!N;s/\n//'|sed '$!N;s/\n//' >ang.1
+if [ ! -f dih.0 ];then printf "" > dih.0;fi
+sed 's/[ \t]*$//g' dih.0|sed '$!N;s/\n//' >dih.1
+printf "  writing t.0 (psf tail)\n"
+printf "\n       0 !NIMPHI: impropers\n\n\n       0 !NDON: donors\n\n\n         0 !NACC:          acceptors\n\n\n       0 !NNB\n" > t.0
+tempfiles="bond.0 ang.0 dih.0"
+outputfiles="h.0 bond.1 ang.1 dih.1 t.0"
+endprogram
+}
+function assemblepsf() {
+printf "\n\nCOMBINEPSF: combine psf parts to final psf\n"
+par=$outpsf;msg="  Out psf as: ";ask;outpsf=$par
+printf "  reading h.0 aa.0 atom.0 b.0 bond.1 a.0 ang.1 d.0 dih.1 t.0\n"
+name=$(date +%Y%m%d%H%M%S)
+cat h.0 aa.0 atom.0 b.0 bond.1 a.0 ang.1 d.0 dih.1 t.0 > $name".psf"
+printf "  rewriting (error check) psf using VMD\n"
+printf "package require psfgen\nresetpsf\nreadpsf $name.psf\nwritepsf           $outpsf\nexit" >  psf.0
+vmd -dispdev text < psf.0 >/dev/null
+tempfiles="h.0 aa.0 atom.0 b.0 bond.1 a.0 ang.1 d.0 dih.1 t.0 psf.0 $name.psf"
+outputfiles="$outpsf"
+endprogram
+}
+function formpsf() {
+countpsf
+formatpsf
+assemblepsf
+}
+
+######################################################################
+
+function residueToindex() {
+printf "\nRESIDUETOINDEX: converts residues to list of index\n"
+par=$residue;pathcheck=0;msg="Remove residues (separate by space):";ask;residue=$par
+printf "set output [open "index.0" "w"]\nset select [atomselect top \"residue   $residue\"]\nset atom {}\nforeach {index} [\$select get index] {lappend atom    [expr \$index+1]}\nputs \$output \"\$atom\"" > run.0
+vmd $readpsf -dispdev text < run.0 >/dev/null
+tempfiles="run.0"
+outputfiles="index.0"
+endprogram
+echo "[modify index.0 if necessary]"
+}
+function prepareRemovalList() {
+for ind in $index;do echo "$((ind+1))" >> index.0;done
+sed 's/ /\n/g' index.0|sort -un > removal.0
+}
+function removal() {
+printf "\nREMOVAL: read from $modifyfile\n"
+aa=$(wc -l $modifyfile|awk '{print $1}')
+printf "
+      program removal
+      integer::b1=0,a1=0
+      integer::map($aa)=1
+      character*78 c
+      open(file='removal.0',unit=1)
+      open(file='$modifyfile',unit=2)       
+      open(file='modified.0',unit=3)       
+      do
+      read(1,'(i8)',end=500,err=500) a1
+      map(a1)=0
+      enddo
+500   continue
+      a1=0;do
+      a1=a1+1
+      read(2,'(a78)',end=600,err=600) c
+      if (map(a1).eq.0) cycle
+      write(3,'(a78)') c
+      enddo
+600   continue
+      end" > removal.f
+gfortran -o 1 removal.f;./1;rm removal.f 1
+tempfiles="removal.f 1"
+outputfiles="modified.0"
+endprogram
+}
+function remap() {
+aa=$(wc -l atom.0|awk '{print $1}')
+printf "
+      program remap
+      integer::b1=0,a1=0,b2=0,a2=0
+      integer::map($aa)=0
+      character*62 c
+      open(file='bond.1',unit=1)
+      open(file='ang.1',unit=2)       
+      open(file='dih.1',unit=3)       
+      open(file='bond.0',unit=4)       
+      open(file='ang.0',unit=5)
+      open(file='dih.0',unit=6)
+      open(file='atom.1',unit=7)
+      open(file='atom.0',unit=8)       
+      do
+      a1=a1+1
+      read(7,'(i8,a62)',end=500,err=500) b1,c
+      map(b1)=a1
+      write(8,'(i8,a62)') a1,c
+      enddo
+500   continue
+      do
+      read(1,'(2i8)',end=600,err=600) b1,a1
+      if ((map(b1).eq.0).OR.(map(a1).eq.0)) cycle
+      write(4,'(2i8)') map(b1),map(a1)
+      enddo
+600   continue
+      do
+      read(2,'(3i8)',end=700,err=700) b1,a1,b2
+      if ((map(b1).eq.0).OR.(map(a1).eq.0).OR.(map(b2).eq.0)) cycle
+      write(5,'(3i8)') map(b1),map(a1),map(b2)
+      enddo
+700   continue
+      do
+      read(3,'(4i8)',end=800,err=800) b1,a1,b2,a2
+      if ((map(b1).eq.0).OR.(map(a1).eq.0).OR.(map(b2).eq.0).OR.
+     &(map(a2).eq.0)) cycle
+      write(6,'(4i8)') map(b1),map(a1),map(b2),map(a2)
+      enddo
+800   continue
+      end" > remap.f
+gfortran -o 1 remap.f;./1;rm remap.f 1
+}
+
+function fixpdb() {
+printf "\nRemoving atoms from $readpdb\n saving pdb as $outpdb\n\n"
+cp $readpdb $outpdb;sed -i '/^ATOM /!d' $outpdb
+modifyfile=$outpdb;removal;mv modified.0 $outpdb
+}
+function fixpsf() {
+sed 's/ / \n /g;s/^/ /;s/$/ /' removal.0 > pattern.0
+echo "Splitting $readpsf into sections";cutpsf
+echo " removing atoms from NATOM"
+modifyfile=atom.0;removal;mv modified.0 atom.1
+mv bond.0 bond.1;mv ang.0 ang.1;mv dih.0 dih.1
+echo " renumbering atoms";remap;countpsf
+echo " saving psf as $outpsf";psf
+}
+
+######################################################################
+
+function cutpsf() {
+printf "\n--------------\nCUTPSF: split psf into sections\n--------------\n"
+printf "\n\n==============\nCUTPSF: split psf into sections\n==============\n"
+par=$readpsf;search="*.psf";msg="  Input psf:";inputfile;readpsf=$par
+sed '/NATOM/,/NBOND/!d;/NATOM/d;/NBOND/d;/^$/d' $readpsf > atom.0
+sed '/NBOND/,/NTHETA/!d;/NBOND/d;/NTHETA/d;/^$/d' $readpsf|sed 's/.\{16\}/&\n/  g'|sed '/^$/d;s/  $/ /' > bond.0
+sed '/NTHETA/,/NPHI/!d;/NTHETA/d;/NPHI/d;/^$/d' $readpsf|sed 's/.\{24\}/&\n/    g'|sed '/^$/d;s/  $/ /' > ang.0
+sed '/NPHI/,/NIMPHI/!d;/NPHI/d;/NIMPHI/d;/^$/d' $readpsf|sed 's/.\{32\}/&\n/    g'|sed '/^$/d;s/  $/ /' > dih.0
+tempfiles=""
+outputfiles="atom.0 bond.0 ang.0 dih.0"
+endprogram
+}
+function bond2link() {
+printf "\n\nBOND2LINK: Generate link.0 from bond.0\n"
+aa=$(awk '{print $1;print $2}' bond.0|sort -n|tail -1)
+printf "
+      program bond2link
+      integer::i,j,k
+
+      integer::neighbor($aa,8)=0,bonded($aa)=0
+
+      open(file='bond.0',unit=1)
+      open(file='link.0',unit=2)
+
+      do
+      read(1,'(2i8)',end=500,err=500) i,j
+      bonded(i)=bonded(i)+1
+      neighbor(i,bonded(i))=j
+      enddo
+500   continue
+
+      do i=1,$aa
+      write(2,'(9i8)') i,(neighbor(i,j),j=1,bonded(i))
+      enddo
+
+      end program" > bond2link.f
+gfortran -o 1 bond2link.f;./1
+tempfiles="bond.0 bond2link.f 1"
+outputfiles="link.0"
+endprogram
+}
+function link2bond() {
+printf "\n\nLINK2BOND: Generate bond.0 ang.0 dih.0 from link.0\n"
+printf "  writing bond.0 ang.0 dih.0 (psf bond, angle, dihedral sections)\n"
+atoms=$(wc -l atom.0|awk '{print $1}')
+big=$(echo "$atoms*48"|bc)
+printf "
+      module m1
+      integer::BIG=$big
+      integer::link($atoms,5)=0,total,num(4)=0
+      integer::center($atoms)=0,neighbor($atoms,8)=0,done($atoms)=0
+      integer::l1,l2,l3
+      integer::i,j,k
+      integer::dih($big,4)=0
+      end module m1
+
+      program hh
+      use m1
+      implicit none
+
+      open(file='link.0',unit=1)
+      open(file='bond.0',unit=2)
+      open(file='ang.0',unit=3)
+      open(file='dih.0',unit=4)
+c     open(file='table',unit=5)
+c     open(file='table2',unit=6)
+
+      !IMPORT .gjf bonding info
+      i=0;do;i=i+1
+      read(1,'(5i8)',end=500,err=501) (link(i,j),j=1,5)
+501   continue !fix error (less than 4 neighbors)
+      enddo
+500   continue
+      total=i-1 !total # lines
+
+      !map array index of all atoms
+      do l1=1,total;do l2=1,5
+      i=link(l1,l2);if (i.eq.0) cycle
+      !==== find empty entry
+      j=1;do l3=1,8
+      if (neighbor(i,l3).eq.0) then 
+      j=l3;exit;endif;enddo
+      if (l2.eq.1) then
+      center(i)=l1
+      else
+      neighbor(i,j)=l1
+      neighbor(i,j+1)=l2
+      endif;enddo;enddo
+
+      !delete
+c     do l1=1,100
+c     write(5,'(8i4)') (neighbor(l1,i),i=1,8)
+c     write(6,'(i4)') center(l1)
+c     enddo
+
+      !START
+      do l1=1,total !1st atom |A
+      do l2=2,5 !loop 2nd atom |A
+      if (link(l1,l2).eq.0) cycle
+      num(2)=num(2)+1 !BOND
+      write(2,'(2i8)') link(l1,1),link(l1,l2)
+
+      i=center(link(l1,l2))
+      if (i.ne.0) then
+      do l3=2,5
+      if (link(i,l3).eq.0) cycle
+      num(3)=num(3)+1 !ANGLE (row A,B) Z
+      write(3,'(3i8)') link(l1,1),link(l1,l2),link(i,l3)
+      call dihedral(link(l1,1),link(l1,l2),link(i,l3))
+      enddo;endif
+
+      j=num(3)
+      do l3=done(link(l1,l2))*2+1,8,2
+      i=neighbor(link(l1,l2),l3)
+      if (i.eq.0) exit
+      if (i.eq.l1) cycle
+      num(3)=num(3)+1 !ANGLE (row A,B) U
+      write(3,'(3i8)') link(l1,1),link(l1,l2),link(i,1)
+      call dihedral(link(l1,1),link(l1,l2),link(i,1))
+      enddo
+      if (j.ne.num(3)) done(link(l1,l2))=done(link(l1,l2))+1
+
+      do l3=l2+1,5
+      if (link(l1,l3).eq.0) cycle
+      num(3)=num(3)+1 !ANGLE (row A)
+      write(3,'(3i8)') link(l1,l2),link(l1,1),link(l1,l3)
+c     write (4,*) \"in\"
+      call dihedral(link(l1,l2),link(l1,1),link(l1,l3))
+c     write (4,*) \"out\"
+      enddo
+      
+      enddo;enddo
+      
+c     write(4,*) num(4)
+
+      do l1=1,BIG
+      if (dih(l1,1).eq.0) cycle
+      do l2=l1+1,BIG
+      if ((dih(l1,1).eq.dih(l2,4)).AND.(dih(l1,4).eq.dih(l2,1))) then
+      if ((dih(l1,2).eq.dih(l2,3)).AND.(dih(l1,3).eq.dih(l2,2))) then
+      num(4)=num(4)-1
+      do l3=1,4
+      dih(l2,l3)=0
+      enddo
+      endif;endif
+      if ((dih(l1,1).eq.dih(l2,1)).AND.(dih(l1,4).eq.dih(l2,4))) then
+      if ((dih(l1,2).eq.dih(l2,2)).AND.(dih(l1,3).eq.dih(l2,3))) then
+      num(4)=num(4)-1
+      do l3=1,4
+      dih(l2,l3)=0
+      enddo
+      endif;endif
+      enddo;enddo
+
+      do l1=1,BIG
+      if (dih(l1,1).eq.0) cycle
+      write(4,'(4i8)') dih(l1,1), dih(l1,2), dih(l1,3), dih(l1,4)
+      enddo
+
+      end
+
+      subroutine dihedral(a,b,c)
+      use m1
+      implicit none
+      integer::a,b,c
+      integer::atom(3)
+      integer::q1,q2,q3,q4,k1,k2,ii
+      
+      atom(1)=a;atom(2)=b;atom(3)=c
+
+      do q1=2,5
+      if (center(atom(3)).eq.0) exit
+      if (link(center(atom(3)),q1).ne.atom(2)) then
+      if (link(center(atom(3)),q1).eq.0) cycle
+      num(4)=num(4)+1
+c     write(4,'(4i8)')      
+c    &atom(1), atom(2), atom(3), link(center(atom(3)),q1)
+      dih(num(4),1)=atom(1);dih(num(4),2)=atom(2);dih(num(4),3)=atom(3)
+      dih(num(4),4)=link(center(atom(3)),q1)
+      endif;enddo
+
+      do q2=1,8,2
+      if (neighbor(atom(3),q2).eq.0) exit
+      if (link(neighbor(atom(3),q2),1).ne.atom(2)) then
+      num(4)=num(4)+1
+c     write(4,'(4i8)') 
+c    &atom(1), atom(2), atom(3), link(neighbor(atom(3),q2),1)
+      dih(num(4),1)=atom(1);dih(num(4),2)=atom(2);dih(num(4),3)=atom(3)
+      dih(num(4),4)=link(neighbor(atom(3),q2),1)
+      endif;enddo
+
+      do q1=2,5
+      if (link(center(atom(1)),q1).ne.atom(2)) then
+      if (link(center(atom(1)),q1).eq.0) cycle
+      num(4)=num(4)+1
+c     write(4,'(4i8)')      
+c    &link(center(atom(1)),q1), atom(1), atom(2), atom(3)
+      dih(num(4),2)=atom(1);dih(num(4),3)=atom(2);dih(num(4),4)=atom(3)
+      dih(num(4),1)=link(center(atom(1)),q1)
+      endif;enddo
+
+      end subroutine" > psfbond.f
+gfortran -o 1 psfbond.f;./1
+tempfiles="psfbond.f 1 link.0 m1.mod"
+outputfiles="atom.0 bond.0 ang.0 dih.0"
+endprogram
+}
+function psfpdb2gjf() {
+printf "\n\nPDB2GJF: Generate gjf from psf and pdb\n"
+par=$readpdb;search="*.pdb";msg="  Input pdb:";inputfile;readpdb=$par
+sed '/^ATOM/!d' $readpdb|awk '{printf "%2s%14.8f%14.8f%14.8f\n",$3,$(NF-5),$(NF-4),$(NF-3)}' >> gjf.0
+par=$readpsf;search="*.psf";msg="  Input psf:";inputfile;readpsf=$par
+cutpsf
+bond2link
+tempfiles="atom.0 ang.0 dih.0"
+outputfiles="link.0 gjf.0"
+endprogram
+formgjf
+}
+function formgjf() {
+printf "\n\nFORMGJF: Generate gjf\n"
+par=$outgjf;msg="  Output gjf:";ask;outgjf=$par
+printf "%%chk=te.chk
+# hf/3-21g geom=connectivity
+
+Title Card Required
+
+0 1
+" > $outgjf
+awk '{printf "%1s%-2s%13s%14.8f%14.8f%14.8f\n","",$1,"",$2,$3,$4}' gjf.0 >> $outgjf
+echo >> $outgjf
+awk '{print $1 " " $2 " 1.0 " $3 " 1.0 " $4 " 1.0 " $5 " 1.0"}' link.0|sed 's/  1.0//g' >> $outgjf
+tempfiles="link.0 gjf.0"
+outputfiles="$outgjf"
+endprogram
+}
+function gjf2psfpdb() {
+printf "\n\nGJF2PSFPDB: Generate pdb and psf from gjf\n"
+par=$readgjf;search="*.gjf";msg="  Input gjf:";inputfile;readgjf=$par
+outname=${readgjf%%.gjf}
+if [ -f $outname.pdb ];then outname="";fi
+if [ -f $outname.psf ];then outname="";fi
+if [ $outname == "" ];then printf "output name for pdb and psf: ";read outname;fi
+segname="G"
+resname=${outname:0:2}
+chain=1
+outpdb=$outname.pdb
+outpsf=$outname.psf
+
+printf "  writing $outpdb\n"
+sed '/^ [A-Z]/!d' $readgjf|awk -v seg=$segname -v res=$resname -v chain=$chain '{printf "ATOM  99999  %-4s%-4s%-4s%-4s %8.3f%8.3f%8.3f  0.00  0.00      %4s\n",$1,res,chain,1,$2,$3,$4,seg}' > $outpdb
+
+printf "  writing atom.0 (psf atoms section)\n"
+sed '/^ [A-Z]/!d' $readgjf|cat -n > gjf.0
+printf "  assigning masses to atoms\n"
+while read line;do
+atom=$(echo $line|awk '{print $2}');mass=0
+if [ "$atom" == "H" ];then mass=1.008;fi
+if [ "$atom" == "C" ];then mass=12.011;fi
+if [ "$atom" == "N" ];then mass=14;fi
+if [ "$atom" == "O" ];then mass=15.999;fi
+if [ "$atom" == "S" ];then mass=32.06;fi
+if [ "$atom" == "Zn" ];then mass=65.39;fi
+if [ "$atom" == "Au" ];then mass=196.97;fi
+if [ "$atom" == "Cd" ];then mass=112.411;fi
+if [ "$atom" == "F" ];then mass=18.99;fi
+if [ "$atom" == "P" ];then mass=30.97;fi
+if [ "$atom" == "B" ];then mass=10.81;fi
+echo $line|awk -v seg=$segname -v mass=$mass -v res=$resname '{printf "%8d %-4s %-4d %-4s %-4s %-4s %10.6f %13.4f %11d\n",$1,seg,1,res,$2,"TYPE",0,mass,0}' >> atom.0
+done < gjf.0
+printf "  reformating gjf bonding section to link.0\n"
+sed '/^.\{50\}/d' $readgjf|sed '/ [0-9]\.[0-9]/!d'|awk '{printf "%8s%8s%8s%8s%8s\n", $1,$2,$4,$6,$8}' > link.0
+link2bond
+formpsf
+tempfiles="gjf.0 link.0 m1.mod"
+outputfiles="$outpdb $outpsf"
+endprogram
+}
+
+######################################################################
+
+function duplicate() {
+duplicate_psf
+duplicate_pdb
+}
+
+function reformat_resid() {
+printf "\n--------------\nREFORMAT_RESID\n--------------\n"
+par=$reformatedpsf;msg="  Output psf:";ask;reformatedpsf=$par
+if [ -f $reformatedpsf ];then rm $reformatedpsf;fi
+par=$reformatpsf;search="*.psf";msg="  Input psf:";inputfile;reformatpsf=$par
+par=$resid;msg="  Change resid to:";ask;resid=$par
+sed '0,/NATOM/!d' $reformatpsf > h.0
+sed '/NATOM/,/NBOND/!d;/NATOM/d;/NBOND/d;/^$/d' $reformatpsf > atom.0
+sed '/NBOND/,$!d' $reformatpsf > t.0
+awk -v resid=$resid '{printf "%8d %-4s %-4d %-4s %-4s %-4s %10.6f %13.4f %11d\n",$1,$2,resid,$4,$5,$6,$7,$8,0}' atom.0 > atom.1
+echo >> atom.1
+cat h.0 atom.1 t.0 > $reformatedpsf
+tempfiles="h.0 atom.0 atom.1 t.0"
+outputfiles="$reformatedpsf"
+endprogram
+}
+function reorderpdb() {
+if [ "$outpdb" == "" ];then echo;ls *.pdb;echo;fi
+par=$outpdb;msg="  Output PDB:";ask;outpdb=$par
+if [ -f $outpdb ];then rm $outpdb;fi
+if [ "$readpdb" == "" ];then echo;ls *.pdb;echo;fi
+par=$readpdb;msg="  Input PDB:";ask;readpdb=$par
+segname=$(sed '/^ATOM/!d' $readpdb|awk '{print $NF}'|sort -V|uniq|paste -s -d' ')
+for segname in $segname;do
+sed "/ $segname /!d" $readpdb >> $outpdb
+done
+}
+function combinepsf() {
+printf "\n\n==============\nCOMBINE_PSF\n==============\n"
+if [ "$readunit" == "" ];then echo;ls *.psf;echo;fi
+par=$readunit;msg="  List of PSF to combine:";ask;readunit=$par
+par=$combinedpsf;msg="  Output psf:";ask;combinedpsf=$par
+if [ -f $combinedpsf ];then rm $combinedpsf;fi
+echo "package require psfgen" > tcl.0
+resid=0
+for readunit in $readunit;do
+if [ -f $readunit ];then
+reformatpsf=$readunit;reformatedpsf=$readunit.0.psf;reformat_resid
+echo "readpsf $reformatedpsf" >> tcl.0
+else
+echo "  Cannot find $readunit"
+fi
+resid=$((resid+1))
+done
+echo "writepsf $combinedpsf" >> tcl.0
+vmd -dispdev text < tcl.0 >/dev/null;echo
+tempfiles="*.psf.0.psf tcl.0"
+outputfiles="$combinedpsf"
+endprogram
+}
+function duplicate_psf() {
+printf "\n\n==============\nDUPLICATE_PSF\n==============\n"
+par=$outpsf;msg="  Output psf:";ask;outpsf=$par
+if [ -f $outpsf ];then rm $outpsf;fi
+par=$readpsf;search="*.psf";msg="  Input psf:";inputfile;readpsf=$par
+par=$num;msg="  Number of duplicates:";ask;num=$par
+
+if [ $num -le 1 ];then echo "Exiting";exit;fi
+uselist="";
+digit=$(($(echo $num|wc -c)-2)) ; # (number of digit in $num - 1)
+for ((j=0;j<=$digit;j++));do
+ sublist=""
+ dec=$(echo "10^$j"|bc)
+ nextdec=$(echo "10^($j+1)"|bc)
+ need=$((${num:$((digit-j)):1}))
+ if [ $dec -eq 1 ];then copy=$readpsf;else copy=${dec}c1.0;fi
+ for ((i=1;i<=10;i++)); do
+ [ $copy != ${dec}c$i.0 ] && (cp $copy ${dec}c$i.0)
+ sublist+=" ${dec}c$i.0"
+ if [ $i -le $need ];then uselist+=" ${dec}c$i.0";fi
+ # exit program
+ if [[ $digit -eq $j && $i -eq $need ]];then break;fi
+ done
+ if [ $digit -ne $j ];then
+ readunit=$sublist
+ combinedpsf=${nextdec}c1.0
+ combinepsf
+ fi
+done
+readunit=$uselist
+combinedpsf=$outpsf
+combinepsf
+tempfiles="*c*.0 *c*.0.0.psf*"
+outputfiles="$outpsf"
+endprogram
+}
+function duplicate_pdb() {
+printf "\n\n==============\nDUPLICATE_PDB\n==============\n"
+par=$outpdb;msg="  Output pdb:";ask;outpdb=$par
+if [ -f $outpdb ];then rm $outpdb;fi
+par=$readpdb;search="*.pdb";msg="  Input pdb:";inputfile;readpdb=$par
+par=$num;msg="  Number of duplicates:";ask;num=$par
+sed '/^ATOM /!d' $readpdb > pdb.0;printf "\n catenating files...\n "
+for ((i=1;i<=$num;i++));do printf "|";done;printf "  $num\n "
+for ((i=1;i<=$num;i++));do printf "|";cat pdb.0|sed "s/NANO/$i/g" >> $outpdb;done
+tempfiles="pdb.0"
+outputfiles="$outpdb"
+endprogram
+}

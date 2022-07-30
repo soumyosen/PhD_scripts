@@ -1,0 +1,61 @@
+-
+------------------------------
+Downloaded the psf, pdb files of equilibrated membranes (CHARMM forcefield): 
+http://terpconnect.umd.edu/~jbklauda/research/download.html
+#Make sure you download the XPLOR format!!! 
+To unzip downloaded files, use: gzip -d *.gz
+
+-------------------------------- 
+Run the extract-1-dppc.tcl script to extract
+pdb, psf files for one dppc molecule: 
+vmd -dispdev text -e extract-1-dppc.tcl > extract-1-dppc.out &
+
+Now, we have pdb, psf files for 1 DPPC molecule. 
+
+-------------------------------- 
+Run getpdb-dppc-neg.f program to obtain inverted 1 DPPC molecule 
+gfortran -o getpdb-dppc-neg.exe getpdb-dppc-neg.f 
+./getpdb-dppc-neg.exe
+
+(for the second part of the monolayer). --> now you have dppc-neg.pdb
+
+-------------------------------- 
+open in VMD dppc1.pdb (dppc-neg.pdb) and identify coordinates of e.g. P atom
+(click on P, see output). 
+
+then open Tk console in VMD and translate each molecule to the wanted position:
+(write in Tk console):
+set my_sel [atomselect top "all"]
+set vec {-5.6 -10.2 -5.5}
+$my_sel moveby $vec
+
+save the structure : select in mouse the line with your structure n VMD Main 
+Window, click File tab --> Save Coordinates -- > dppc1-cent.pdb
+
+
+-------------------------------- 
+After you get dppc1-cent.pdb and dppc-neg-cent.pdb , use them 
+as input for program: getpdb-dppc-bi.f --> this program gives you the bilayer.
+
+I also have a program getpdb-dppc-mono.f - generates a monolayer of DPPC.
+
+-------------------------------- 
+Now, to get a psf file for any of the pdb files involving DPPC, use this:
+in terminal type psfgen
+
+then type in order:
+resetpsf
+topology  top_all36_lipid.rtf 
+segment O1 {pdb dppc-bilayer.pdb}
+coordpdb dppc-bilayer2.pdb
+writepsf dppc-bilayer.psf
+
+exit
+>>>>>>
+Make sure you put top_all36_lipid.rtf file in your working folder. If you
+look in this topology file, and search for DPPC, DOPC, you will find them
+there. The topology files (toppar_c36_aug12.tgz) can be downloaded from: 
+http://mackerell.umaryland.edu/CHARMM_ff_params.html 
+
+To unzip use: tar -xvzf toppar_c36_aug12.tgz
+
